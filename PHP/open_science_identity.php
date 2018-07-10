@@ -118,7 +118,7 @@ class OpenScienceIdentity {
         // Convert $string to a lower-case, anglicized ASCII version of itself
         setlocale(LC_CTYPE, 'en_US.UTF8');
         // iconv is here used to change accented characters to unaccented ones
-        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        $string = iconv('UTF-8', 'us-ascii//TRANSLIT', $string);
         $cleaned_up = mb_strtolower($string);
         $cleaned_up = preg_replace('/[^a-z0-9]+/', '', $cleaned_up);
 
