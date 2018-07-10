@@ -45,31 +45,47 @@ if (($handle = fopen($db_filepath, "r")) !== FALSE) {
             // TODO: add verbosity levels.
             echo " => INVALID. expected $sig\n";
             $num_inv += 1;
-            if (! $sig === 'invalid') {
+            if ($sig !== 'invalid') {
                 $report .= "Unexpected invalid: ";
                 $report .= implode(', ', $id->bad_attributes);
+                $report .= " Entry=" . implode(',', $line) . "\n";
             }
+            continue;
         }
 
         try {
             $realsig = $id->toSignature();
         } catch (Exception $e) {
-            echo "  => EXCEPTION, expected: {$sig}";
+            echo "  => EXCEPTION, expected: {$sig}\n";
             $num_exc += 1;
             if ($sig !== 'exception') {
-                $report .= "Unexcepted exception: {$e->getMessage()}";
+                $report .= "Unexpected exception: {$e->getMessage()}\n";
             }
+            continue;
         }
 
         if ($realsig !== $sig) {
             echo "  => SIGNATURE MISMATCH, got {$realsig}, expected: {$sig}\n";
             $num_mis += 1;
-            $report .= "Signature mismatch: Entry=#{line}\n";
+            $report .= "Signature mismatch: Entry=" . implode(',', $line) . "\n";
         } else {
             echo " => SIGNATURE OK, got {$realsig}\n";
             $num_sig += 1;
         }
     }
     fclose($handle);
+}
+if (!empty($report)) { 
+    echo "Report of errors:\n\n";
+    echo " => {$num_mis} signatures FAILED TO MATCH\n";
+    echo " => {$num_sig}/{$num_exp_sig} signatures verified\n";
+    echo " => {$num_exc}/{$num_exp_exc} exceptions\n";
+    echo " => {$num_inv}/{$num_exp_inv} invalid entries\n";
+    echo $report;
+} else {
+    echo "All entries behaved **like expected**:\n\n";
+    echo " => {$num_sig}/{$num_exp_sig} signatures verified\n";
+    echo " => {$num_exc}/{$num_exp_exc} exceptions that were expected\n";
+    echo " => {$num_inv}/{$num_exp_inv} invalid entries that were expected\n";
 }
 

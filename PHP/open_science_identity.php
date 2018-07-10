@@ -66,6 +66,7 @@ class OpenScienceIdentity {
     }
 
     public function valid(): Bool {
+        $this->bad_attributes = array();
         if (empty($this->cleanFirstName())) {
             $this->bad_attributes[] = 'first name';
         }
@@ -76,13 +77,13 @@ class OpenScienceIdentity {
             $this->bad_attributes[] = 'last name';
         }
         if (empty($this->cleanGender()) ||
-            ! in_array($this->cleanGender(), $this::GENDER_VALUES)
-        ) {
+            !in_array($this->cleanGender(), $this::GENDER_VALUES)) 
+        {
             $this->bad_attributes[] = 'gender';
         }
         if (empty($this->birth_day) ||
-            ! preg_match($this::DOB_REGEX, $this->birth_day)
-        ) {
+            ! preg_match($this::DOB_REGEX, $this->birth_day))
+        {
             $this->bad_attributes[] = 'birthday';
         }
         if (empty($this->cleanCityOfBirth())) {
@@ -117,7 +118,7 @@ class OpenScienceIdentity {
         // Convert $string to a lower-case, anglicized ASCII version of itself
         setlocale(LC_CTYPE, 'en_US.UTF8');
         // iconv is here used to change accented characters to unaccented ones
-        //$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
         $cleaned_up = mb_strtolower($string);
         $cleaned_up = preg_replace('/[^a-z0-9]+/', '', $cleaned_up);
 
