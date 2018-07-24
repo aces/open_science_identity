@@ -220,19 +220,21 @@ rd.on('line', function(line) {
         num_sig += 1;
     }
 });
-
 //TODO: make this run after the read line code...
-if (report) { 
-    console.log("Report of errors:");
-    console.log(" => {" + num_mis + "} signatures FAILED TO MATCH");
-    console.log(" => {" + num_sig + "}/{" + num_exp_sig + "} signatures verified");
-    console.log(" => {" + num_exc + "}/{ " + num_exp_exc + "} exceptions");
-    console.log(" => {" + num_inv + "}/{" + num_exp_inv + "} invalid entries");
-    console.log(report);
-} else {
-    console.log("All entries behaved **like expected**:");
-    console.log(" => {" + num_sig + "}/{" + num_exp_sig + "} signatures verified");
-    console.log(" => {" + num_exc + "}/{" + num_exp_exc + "} exceptions that were expected");
-    console.log(" => {" + num_inv + "}/{" + num_exp_inv + "} invalid entries that were expected");
-}
+rd.on('close', function() {
+    if (report) { 
+        console.log();
+        console.log("Report of errors:");
+        console.log(" => " + num_mis + " signatures FAILED TO MATCH");
+        console.log(" => " + num_sig + "/" + num_exp_sig + " signatures verified");
+        console.log(" => " + num_exc + "/ " + num_exp_exc + " exceptions");
+        console.log(" => " + num_inv + "/" + num_exp_inv + " invalid entries");
+        console.log(report);
+    } else {
+        console.log("All entries behaved **like expected**:");
+        console.log(" => " + num_sig + "/" + num_exp_sig + " signatures verified");
+        console.log(" => " + num_exc + "/" + num_exp_exc + " exceptions that were expected");
+        console.log(" => " + num_inv + "/" + num_exp_inv + " invalid entries that were expected");
+    }
 
+});
