@@ -7,6 +7,9 @@
  *
  *   John Saigle <john.saigle@mcgill.ca>
  */
+
+let pbkdf2 = require('pbkdf2');
+
 function OpenScienceIdentity(attributes = []){
     this.IDENTITY_ATTRIBUTES = [
         'gender',
@@ -18,6 +21,7 @@ function OpenScienceIdentity(attributes = []){
     this.PBKDF2_ITERATIONS = 10000;
     this.PBKDF2_SALT_FUNCTION = ''//'strrev' #TODO Figure this out
     this.PBKDF2_HASH_FUNCTION = 'sha256';
+    this.PBKDF2_KEY_LENGTH = 64;
 
     this.GENDER_VALUES = [
         'male',
@@ -86,7 +90,8 @@ OpenScienceIdentity.prototype.valid = function() {
 OpenScienceIdentity.prototype.validate = function() {
     if (! this.valid) {
         console.log("An exception! Fill me in");
-        // throw an exception
+        throw "Not all identity components have valid initial values: " 
+        + this.bad_attributes.join(',');
     }
 };
 
@@ -113,8 +118,32 @@ OpenScienceIdentity.prototype.plainAlpha = function(string) {
 OpenScienceIdentity.prototype.toSignature = function() {
     this.validate;
     let sig_key = this.signatureKey;
-    // do hashing
-    return "hash";
+    let salt = this.reverseString(sig_key);
+    // Calculate hash. See below links for details.
+    //      <https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback>
+    //      <https://github.com/crypto-browserify/pbkdf2>
+    pbkdf2.pbkdf2(
+        sig_key,
+        salt,
+        this.PKBDF2_ITERATIONS,
+        this.PKBDF2_KEY_LENGTH,
+        this.PKBDF2_HASH_FUNCTION,
+        (err, derivedKey) => {
+            if (err) throw err;
+            return derivedKey;
+        }
+    );
+
+};
+
+// The below is an implementation of naive (i.e. not Unicode-aware) string
+// reversal implemented in JavaScript and taken from StackOverflow
+// <https://stackoverflow.com/a/959004/6189922>.
+// It should work for our purposes since this will be only be called on the
+// variable `sig_key` which represents a concatenation of "clean" input fields
+// which have been transliterated into plain ASCII.
+OpenScienceIdentity.prototype.reverseString = function() {
+    return s.plit('').reverse().join('');
 };
 
 // BEGIN test code
@@ -171,4 +200,39 @@ rd.on('line', function(line) {
         }
         return;
     }
+    try {
+        realsig = id.toSignature();
+    } catch (exception) {
+        console.log("  => EXCEPTION, expected: {" + sig + "}");
+        num_exc += 1;
+        if (sig !== 'exception') {
+            report += "Unexpected exception: {" + exception + "}";
+        }
+        return;
+    }
+
+    if (realsig !== sig) {
+        console.log("  => SIGNATURE MISMATCH, got {$realsig}, expected: {" + sig + "}");
+        num_mis += 1;
+        report += "Signature mismatch: Entry=" + line;
+    } else {
+        console.log( " => SIGNATURE OK, got {" + realsig + "}");
+        num_sig += 1;
+    }
 });
+
+//TODO: make this run after the read line code...
+if (report) { 
+    console.log("Report of errors:");
+    console.log(" => {" + num_mis + "} signatures FAILED TO MATCH");
+    console.log(" => {" + num_sig + "}/{" + num_exp_sig + "} signatures verified");
+    console.log(" => {" + num_exc + "}/{ " + num_exp_exc + "} exceptions");
+    console.log(" => {" + num_inv + "}/{" + num_exp_inv + "} invalid entries");
+    console.log(report);
+} else {
+    console.log("All entries behaved **like expected**:");
+    console.log(" => {" + num_sig + "}/{" + num_exp_sig + "} signatures verified");
+    console.log(" => {" + num_exc + "}/{" + num_exp_exc + "} exceptions that were expected");
+    console.log(" => {" + num_inv + "}/{" + num_exp_inv + "} invalid entries that were expected");
+}
+
