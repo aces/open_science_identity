@@ -22,7 +22,7 @@ function OpenScienceIdentity(attributes = []){
     this.PBKDF2_ITERATIONS = 10000;
     this.PBKDF2_SALT_FUNCTION = ''//'strrev' #TODO Figure this out
     this.PBKDF2_HASH_FUNCTION = 'sha256';
-    this.PBKDF2_KEY_LENGTH = 64;
+    this.PBKDF2_KEY_LENGTH = 32;
 
     this.GENDER_VALUES = [
         'male',
@@ -30,7 +30,7 @@ function OpenScienceIdentity(attributes = []){
         'unknown',
         'other'
     ];
-    this.DOB_REGEX = '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/';
+    this.DOB_REGEX = /^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])$/;
     this.bad_attributes = [];
 
     this.gender        = attributes['gender']        || '';
@@ -77,8 +77,7 @@ OpenScienceIdentity.prototype.valid = function() {
    {
        this.bad_attributes.push('gender');
    }
-   // TODO: ! birthday preg match...
-   if (this.birth_day.length < 0)
+   if (this.birth_day.length < 0 || ! this.birth_day.match(this.DOB_REGEX))
    {
        this.bad_attributes.push('birthday');
    }
@@ -111,7 +110,7 @@ OpenScienceIdentity.prototype.signatureKey = function() {
 OpenScienceIdentity.prototype.plainAlpha = function(string) {
     let cleaned = transliterate.transliterate(string);
     cleaned = cleaned.toLowerCase();
-    cleaned = cleaned.replace('/[^a-z0-9]+/', '');
+    cleaned = cleaned.replace(/[^a-z0-9]+/g, '');
     return cleaned;
 };
 
@@ -122,18 +121,15 @@ OpenScienceIdentity.prototype.toSignature = function() {
     // Calculate hash. See below links for details.
     //      <https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback>
     //      <https://github.com/crypto-browserify/pbkdf2>
-    pbkdf2.pbkdf2(
+    // TODO this is calcualted out of sync right now which obviously won't work...
+    let hash = pbkdf2.pbkdf2Sync(
         sig_key,
         salt,
         this.PBKDF2_ITERATIONS,
         this.PBKDF2_KEY_LENGTH,
-        this.PBKDF2_HASH_FUNCTION,
-        (err, derivedKey) => {
-            if (err) throw err;
-            return derivedKey;
-        }
+        this.PBKDF2_HASH_FUNCTION
     );
-
+    return hash.toString('hex');
 };
 
 // The below is an implementation of naive (i.e. not Unicode-aware) string
@@ -188,7 +184,7 @@ rd.on('line', function(line) {
         num_exp_sig += 1;
     }
 
-    console.log("KEY={" + id.signatureKey() + "}");
+    console.log("KEY=" + id.signatureKey() + "");
 
     if (! id.valid()) {
         console.log(" => INVALID. expected " + sig);
@@ -213,11 +209,11 @@ rd.on('line', function(line) {
     }
 
     if (realsig !== sig) {
-        console.log("  => SIGNATURE MISMATCH, got " + realsig + ", expected: " + sig );
+        console.log("  => SIGNATURE MISMATCH, got " + realsig + ", expected: " + sig);
         num_mis += 1;
         report += "Signature mismatch: Entry=" + line + "\n";
     } else {
-        console.log( " => SIGNATURE OK, got {" + realsig + "}");
+        console.log( " => SIGNATURE OK, got " + realsig);
         num_sig += 1;
     }
 });
