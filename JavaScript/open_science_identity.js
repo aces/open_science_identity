@@ -62,26 +62,25 @@ OpenScienceIdentity.prototype.cleanCityOfBirth = function() {
 
 OpenScienceIdentity.prototype.valid = function() {
     this.bad_attributes = [];
-    if (this.cleanFirstName().length < 0) {
+    if (! this.cleanFirstName()) {
         this.bad_attributes.push('first name');
     }
-    if (this.cleanMiddleName().length < 0) {
+    if (! this.cleanMiddleName()) {
         this.bad_attributes.push('middle name');
     }
-    if (this.cleanLastName().length < 0) {
+    if (! this.cleanLastName()) {
         this.bad_attributes.push('last name');
     }
-    if (this.cleanGender().length < 0 ||
-        ! this.GENDER_VALUES.includes(this.cleanGender())
+    if (! this.cleanGender() || ! this.GENDER_VALUES.includes(this.cleanGender())
        ) 
    {
        this.bad_attributes.push('gender');
    }
-   if (this.birth_day.length < 0 || ! this.birth_day.match(this.DOB_REGEX))
+   if (! this.birth_day || ! this.birth_day.match(this.DOB_REGEX))
    {
        this.bad_attributes.push('birthday');
    }
-   if (this.cleanCityOfBirth().length < 0) {
+   if (! this.cleanCityOfBirth()) {
        this.bad_attributes.push('city of birth');
    }
    return this.bad_attributes.length === 0;
@@ -119,9 +118,8 @@ OpenScienceIdentity.prototype.toSignature = function() {
     let sig_key = this.signatureKey();
     let salt = this.reverseString(sig_key);
     // Calculate hash. See below links for details.
-    //      <https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback>
+    //      <https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2sync_password_salt_iterations_keylen_digest>
     //      <https://github.com/crypto-browserify/pbkdf2>
-    // TODO this is calcualted out of sync right now which obviously won't work...
     let hash = pbkdf2.pbkdf2Sync(
         sig_key,
         salt,
@@ -142,7 +140,7 @@ OpenScienceIdentity.prototype.reverseString = function(s) {
     return s.split('').reverse().join('');
 };
 
-// BEGIN test code
+// ======== BEGIN test code TODO put this in a separate file
 const fs = require('fs'),
     readline = require('readline');
 
