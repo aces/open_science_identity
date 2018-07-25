@@ -9,4 +9,4 @@ platform.
 
 * Prototype code that will be finalized over time. Missing
   some constants, conventions need to be established for genders, etc.
-* Complete implementations in Ruby, PHP; Perl and Javascript in progress; Python not started.
+* Complete implementations in Ruby, PHP, and JavaScript; Perl in progress; Python not started.
