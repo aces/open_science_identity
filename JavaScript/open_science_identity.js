@@ -161,7 +161,9 @@ let num_exp_inv = 0;
 
 // For every line, create a new identity and check that the result is valid.
 rd.on('line', function(line) {
-    console.log(line);
+    if (!line || line.startsWith('#')) {
+        return;
+    }
     let parts = line.split(',');
     let id = new OpenScienceIdentity(
         {
