@@ -13,10 +13,9 @@ $num_mis = 0;
 $num_exc = $num_exp_exc = 0;
 $num_inv = $num_exp_inv = 0;
 
-// TODO: move the test db from the Ruby folder
 // Open the CSV database.  Iterate over each line and store the values in the
 // array $line.  Extract these values into individual variables.
-$db_filepath = "../Ruby/names_db.csv";
+$db_filepath = "../test/names_db.csv";
 if (($handle = fopen($db_filepath, "r")) !== FALSE) {
     while (($line = fgetcsv($handle, 1000, ",")) !== FALSE) {
         list($gender, $first_name, $middle_name, $last_name, $birth_day, $city_of_birth, $sig) = $line;

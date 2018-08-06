@@ -1,6 +1,6 @@
 
-require 'i18n'
 require 'active_support/all'
+require 'i18n'
 require 'pbkdf2'
 
 #
@@ -126,7 +126,7 @@ class OpenScienceIdentity
   def valid?
     @bad_attributes = []
     @bad_attributes << :first_name    if self.clean_first_name.blank?
-    @bad_attributes << :middle_name   if self.clean_middle_name.blank?
+    #@bad_attributes << :middle_name   if self.clean_middle_name.blank?
     @bad_attributes << :last_name     if self.clean_last_name.blank?
     @bad_attributes << :gender        if self.gender.blank? ||
                                          (! GENDER_VALUES.include? self.clean_gender)
@@ -168,16 +168,20 @@ class OpenScienceIdentity
   private
 
   def plain_alpha(string)
+
+    # Blank strings or nil are allowed! (e.g. mostly for middle name),
+    # and it's not the role of this method to allow or reject them.
+    return "" if string.blank?
+
     cleaned_up = I18n
       .transliterate(string, :locale => :en)  # tranforms accented characters to unaccented ones
       .downcase
       .gsub(/[^a-z0-9]+/,"")
 
+    # Check that we can really transform every multibyte character
     if cleaned_up.each_byte.to_a.size != cleaned_up.each_char.to_a.size
       raise "Unhandled multibyte characters in string: before: '#{string}' after: '#{cleaned_up}'"
     end
-
-    #raise "Empty string produced after cleaning '#{string}'" if cleaned_up.blank?
 
     cleaned_up
   end

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
-require './open_science_identity.rb'
+# Quick ugly verification script
+
+require '../Ruby/open_science_identity.rb'
 
 report  = ""
 num_sig = 0  ; num_exp_sig = 0
@@ -14,6 +16,10 @@ corrected_db = File.open("new_names_db.csv","w:UTF-8")
 read_db      = File.open("names_db.csv","r:UTF-8")
 
 while line = (read_db.readline rescue nil)
+  if line.blank? || line.starts_with?("#")
+    corrected_db.write line
+    next
+  end
   line.strip!
   print "."              if verbose == 1
   puts "---------------" if verbose > 1

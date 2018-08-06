@@ -138,7 +138,7 @@ sub is_valid {
 sub validate {
   my $self  = shift;
   my $valid = $self->is_valid();
-  return if $valid;
+  return 1 if $valid;
   my $bad = join(", ",@{$self->{'_bad_attributes'}});
   die "Not all identity components have valid initial values: $bad\n";
 }
