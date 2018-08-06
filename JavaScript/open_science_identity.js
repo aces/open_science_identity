@@ -105,6 +105,9 @@ OpenScienceIdentity.prototype.signatureKey = function() {
 };
 
 OpenScienceIdentity.prototype.plainAlpha = function(string) {
+    if (string === null || string.trim().length < 1) {
+        return '';
+    }
     let cleaned = transliterate.transliterate(string);
     cleaned = cleaned.toLowerCase();
     cleaned = cleaned.replace(/[^a-z0-9]+/g, '');
