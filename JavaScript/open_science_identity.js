@@ -146,7 +146,7 @@ const fs = require('fs'),
     readline = require('readline');
 
 let rd = readline.createInterface({
-    input: fs.createReadStream('../Ruby/names_db.csv'), //TODO: don't store this file in Ruby dir
+    input: fs.createReadStream('../test/names_db.csv'),
     console: false
 });
 
