@@ -113,6 +113,10 @@ class OpenScienceIdentity {
     }
 
     private function plainAlpha($string): String {
+        // If given a "blank" value, return the empty string.
+        if (is_null($string) || strlen(trim($string)) < 1) {
+            return "";
+        }
         // Convert $string to a lower-case, anglicized ASCII version of itself
         setlocale(LC_CTYPE, 'en_US.UTF8');
         // iconv is here used to change accented characters to unaccented ones
