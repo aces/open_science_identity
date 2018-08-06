@@ -70,9 +70,7 @@ class OpenScienceIdentity {
         if (empty($this->cleanFirstName())) {
             $this->bad_attributes[] = 'first name';
         }
-        if (empty($this->cleanMiddleName())) {
-            $this->bad_attributes[] = 'middle name';
-        }
+        // No check for middle name because it is an optional field.
         if (empty($this->cleanLastName())) {
             $this->bad_attributes[] = 'last name';
         }

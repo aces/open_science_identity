@@ -65,9 +65,7 @@ OpenScienceIdentity.prototype.valid = function() {
     if (! this.cleanFirstName()) {
         this.bad_attributes.push('first name');
     }
-    if (! this.cleanMiddleName()) {
-        this.bad_attributes.push('middle name');
-    }
+    // No check for middle name because it's optional
     if (! this.cleanLastName()) {
         this.bad_attributes.push('last name');
     }
