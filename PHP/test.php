@@ -18,6 +18,10 @@ $num_inv = $num_exp_inv = 0;
 $db_filepath = "../test/names_db.csv";
 if (($handle = fopen($db_filepath, "r")) !== FALSE) {
     while (($line = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        // Ignore commented lines (Perl-style comments are used in the test file)
+        if (empty($line[0]) || strpos($line[0], '#') === 0) {
+            continue;
+        }
         list($gender, $first_name, $middle_name, $last_name, $birth_day, $city_of_birth, $sig) = $line;
         // Keep track of totals
         if ($sig === 'invalid') {

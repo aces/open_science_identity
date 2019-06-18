@@ -105,6 +105,9 @@ OpenScienceIdentity.prototype.signatureKey = function() {
 };
 
 OpenScienceIdentity.prototype.plainAlpha = function(string) {
+    if (string === null || string.trim().length < 1) {
+        return '';
+    }
     let cleaned = transliterate.transliterate(string);
     cleaned = cleaned.toLowerCase();
     cleaned = cleaned.replace(/[^a-z0-9]+/g, '');
@@ -143,7 +146,7 @@ const fs = require('fs'),
     readline = require('readline');
 
 let rd = readline.createInterface({
-    input: fs.createReadStream('../Ruby/names_db.csv'), //TODO: don't store this file in Ruby dir
+    input: fs.createReadStream('../test/names_db.csv'),
     console: false
 });
 
@@ -158,7 +161,9 @@ let num_exp_inv = 0;
 
 // For every line, create a new identity and check that the result is valid.
 rd.on('line', function(line) {
-    console.log(line);
+    if (!line || line.startsWith('#')) {
+        return;
+    }
     let parts = line.split(',');
     let id = new OpenScienceIdentity(
         {
